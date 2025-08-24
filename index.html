@@ -1,0 +1,787 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hero + Intro + Carruseles + About + Contact + Footer</title>
+    <style>
+        /* ===== Reset & helpers ===== */
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            scroll-padding-bottom: 0;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block
+        }
+
+
+
+        /* ===== Vars para escalado ===== */
+        :root {
+            --page-pad: clamp(12px, 2.5vw, 32px);
+            --container: min(92rem, 92vw);
+            --radius: 18px;
+            --gold: #bfa447;
+            --gold-2: #9f8536;
+
+            /* Carrusel */
+            --nav: 40px;
+            /* tamaño botón */
+            --side-pad: 3.636%;
+            /* 29.813px/820 aprox */
+            --nav-distance: clamp(28px, ((100vw - min(820px, 100%)) / 2) * 0.6, 200px);
+            --dot: 9px;
+        }
+
+        body {
+            overflow-y: auto;
+            scroll-snap-type: y proximity;
+            font-family: system-ui, Segoe UI, Roboto, Ubuntu, Arial;
+            color: #000;
+            background: #fff;
+        }
+
+        /* Cada “slide” */
+        .slide {
+            min-height: 50vh;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+            position: relative;
+            padding: var(--page-pad);
+        }
+
+        .slide1 {
+            /* hero: 100svh para móviles con barra dinámica */
+            min-height: 100svh;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+            position: relative;
+            padding: 0;
+            /* hero a pantalla completa */
+        }
+
+        /* ===== HERO (GIF) ===== */
+        .slide-hero {
+            background: #000;
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0
+        }
+
+        .hero-bg img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            image-rendering: auto;
+        }
+
+        /* ===== Intro (slide 0) ===== */
+        .slide-0 {
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .intro-wrap {
+            width: 100%;
+            max-width: var(--container);
+            margin: auto
+        }
+
+        .intro-title {
+            font-family: "Varela Round", Arial, sans-serif;
+            font-size: clamp(20px, 3.2vw, 32px);
+            line-height: 1.25;
+            color: #C6B256;
+            margin: 0 0 12px;
+        }
+
+        .intro-sub {
+            font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+            font-size: clamp(12px, 1.7vw, 14px);
+            margin: 0;
+            color: #000;
+        }
+
+        /* ===== Carruseles (slide 1) ===== */
+        .slide-1 {
+            background: #000;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .col-stack {
+            width: 100%;
+            max-width: clamp(720px, 92vw, 920px);
+            display: flex;
+            flex-direction: column;
+            gap: clamp(12px, 2vw, 18px);
+            margin: auto;
+        }
+
+        .wix-box {
+            width: min(820px, 100%);
+            aspect-ratio: 820 / 549;
+            position: relative;
+            border-radius: var(--radius);
+            overflow: visible;
+            margin-inline: auto;
+        }
+
+        .wix-inner {
+            position: absolute;
+            inset: 0;
+            padding: 0 var(--side-pad)
+        }
+
+        .carousel {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: var(--radius);
+            background: #111;
+            overflow: visible;
+        }
+
+        .carousel__viewport {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            border-radius: inherit
+        }
+
+        .carousel__track {
+            display: flex;
+            height: 100%;
+            transition: transform .45s cubic-bezier(.2, .8, .2, 1);
+            will-change: transform;
+            touch-action: pan-y;
+        }
+
+        .carousel__slide {
+            flex: 0 0 100%;
+            height: 100%;
+            display: grid;
+            place-items: center;
+            overflow: hidden
+        }
+
+        .carousel__slide>img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover
+        }
+
+        .plate {
+            width: 100%;
+            height: 100%;
+            display: grid;
+            place-items: center;
+            background: radial-gradient(90% 130% at 30% 20%, #d6bf63 0%, var(--gold) 45%, var(--gold-2) 100%);
+            box-shadow: inset 0 4px 12px rgba(0, 0, 0, .2);
+        }
+
+        .plate h2 {
+            margin: 0;
+            color: #222;
+            font-size: clamp(18px, 3.2vw, 44px);
+            background: rgba(255, 255, 255, .75);
+            padding: .25em .6em;
+            border-radius: 12px;
+            mix-blend-mode: soft-light;
+        }
+
+        .carousel__btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: var(--nav);
+            height: var(--nav);
+            border: 0;
+            border-radius: 50%;
+            cursor: pointer;
+            background: #e6cf74;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .45);
+            display: grid;
+            place-items: center;
+            z-index: 5;
+            /* hit area táctil mínima */
+            min-width: 44px;
+            min-height: 44px;
+        }
+
+        .carousel__btn[disabled] {
+            opacity: 0;
+            pointer-events: none
+        }
+
+        .carousel__btn.prev {
+            left: calc(-1 * var(--nav-distance))
+        }
+
+        .carousel__btn.next {
+            right: calc(-1 * var(--nav-distance))
+        }
+
+        .carousel__icon {
+            width: 58%;
+            height: 58%
+        }
+
+        .carousel__icon path {
+            fill: #fff
+        }
+
+        .carousel__dots {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 10px;
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            z-index: 2;
+        }
+
+        .carousel__dot {
+            width: var(--dot);
+            height: var(--dot);
+            border-radius: 50%;
+            border: 0;
+            background: #7b6a2b;
+            opacity: .55;
+            transition: opacity .2s, transform .2s;
+        }
+
+        .carousel__dot[aria-current="true"] {
+            opacity: 1;
+            transform: scale(1.15);
+            background: var(--gold)
+        }
+
+        /* ===== About (blanco) ===== */
+        .slide-about {
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .about-wrap {
+            width: 100%;
+            max-width: 560px;
+            margin: auto;
+            text-align: center
+        }
+
+        .about-photo {
+            width: clamp(140px, 24vw, 200px);
+            height: clamp(140px, 24vw, 200px);
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 24px;
+            border: 6px solid rgba(214, 191, 99, .35);
+            filter: grayscale(.1) sepia(.2);
+        }
+
+        .about-title {
+            font-family: 'Varela Round', Arial, sans-serif;
+            color: #C6B256;
+            font-size: clamp(22px, 3vw, 26px);
+            margin: 0 0 16px;
+        }
+
+        .about-text {
+            font: 300 clamp(13px, 1.8vw, 14px) / 1.65 "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+            color: #000;
+            max-width: 36ch;
+            margin: 0 auto;
+        }
+
+        .about-text p {
+            margin: 0 0 14px
+        }
+
+        /* ===== Contact (dorado) ===== */
+        .slide-contact {
+            background: #cdb756;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            scroll-snap-align: none !important;
+            scroll-snap-align: start;
+            /* ya no se queda atrapado */
+            padding-bottom: 40px;
+            /* deja espacio de respiro */
+        }
+
+        .contact-wrap {
+            width: 100%;
+            max-width: 560px;
+            margin: auto
+        }
+
+        .contact-title {
+            font-family: 'Varela Round', Arial, sans-serif;
+            font-size: clamp(24px, 4vw, 32px);
+            color: #000;
+            margin: 0 0 28px;
+        }
+
+        .contact-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: clamp(16px, 3vw, 22px);
+        }
+
+        .contact-icon {
+            width: 35px;
+            height: 35px;
+            margin-bottom: 8px;
+            border-radius: 10px;
+            padding: 6px;
+            object-fit: contain;
+        }
+
+        .contact-link {
+            font: 300 clamp(14px, 2vw, 16px) / 1.4 "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+            color: #000;
+            text-decoration: underline;
+            word-break: break-word;
+        }
+
+        /* ===== Footer ===== */
+        .site-footer {
+            scroll-snap-align: end !important;
+            scroll-snap-stop: always;
+            /* fuerza a detenerse en el footer */
+            min-height: 18vh;
+            /* dale cuerpo para que pueda snapear */
+            padding-block: clamp(16px, 4vh, 40px);
+        }
+
+        .site-footer .footer-inner {
+            max-width: var(--container);
+            margin: 0 auto;
+            text-align: right;
+            font-family: 'Varela Round', sans-serif;
+            font-size: 10px;
+            color: #000;
+        }
+
+        /* ===== Breakpoints ===== */
+        /* Tablet */
+        @media (max-width: 992px) {
+            :root {
+                --nav: 36px;
+                --nav-distance: clamp(20px, 5vw, 80px);
+                --dot: 8px;
+            }
+
+            .carousel__btn {
+                box-shadow: 0 3px 10px rgba(0, 0, 0, .4)
+            }
+
+            .plate h2 {
+                padding: .22em .55em
+            }
+        }
+
+        /* Móvil grande */
+        @media (max-width: 768px) {
+            :root {
+                --nav: 34px;
+                --nav-distance: clamp(16px, 5vw, 56px);
+                --dot: 8px;
+            }
+
+            .wix-box {
+                border-radius: 14px
+            }
+
+            .carousel {
+                background: #131313
+            }
+        }
+
+        /* Móvil pequeño */
+        @media (max-width: 480px) {
+            :root {
+                --nav: 32px;
+                --nav-distance: 40px;
+                --dot: 7px;
+            }
+
+            .slide {
+                padding: clamp(12px, 3vw, 18px)
+            }
+
+            .wix-inner {
+                padding: 0 2.8%
+            }
+
+            /* un pelín menos de side padding */
+            .site-footer .footer-inner {
+                text-align: center
+            }
+        }
+
+        /* Accesibilidad / reduce motion */
+        @media (prefers-reduced-motion: reduce) {
+            .carousel__track {
+                transition: none
+            }
+
+            html:focus-within {
+                scroll-behavior: auto
+            }
+        }
+
+        /* ==== Ajustes carrusel tablet & mobile (override) ==== */
+
+        /* Laptop/Tablet */
+        @media (max-width: 1024px) {
+            :root {
+                --nav: 38px;
+                --dot: 8px;
+            }
+
+            /* Menos “alto” el carrusel */
+            .wix-box {
+                aspect-ratio: 16 / 10;
+            }
+
+            /* Un poco más de respiro lateral dentro de la caja */
+            .wix-inner {
+                padding: 0 5.5%;
+            }
+
+            /* Flechas dentro del slide (no usando la distancia negativa) */
+            .slide-1 .carousel__btn.prev {
+                left: 12px;
+            }
+
+            .slide-1 .carousel__btn.next {
+                right: 12px;
+            }
+        }
+
+        /* Tablet pequeña / móvil grande */
+        @media (max-width: 768px) {
+            :root {
+                --nav: 36px;
+                --dot: 8px;
+            }
+
+            /* Relación más ancha para que no se vea tan “alta” */
+            .wix-box {
+                aspect-ratio: 16 / 9;
+            }
+
+            .wix-inner {
+                padding: 0 6%;
+            }
+
+            /* +padding interior */
+            /* Flechas dentro del marco */
+            .slide-1 .carousel__btn.prev {
+                left: 10px;
+            }
+
+            .slide-1 .carousel__btn.next {
+                right: 10px;
+            }
+
+            /* Opcional: radio un poco menor para pantallas chicas */
+            .carousel__viewport {
+                border-radius: 14px;
+            }
+        }
+
+        /* Móvil */
+        @media (max-width: 520px) {
+            :root {
+                --nav: 34px;
+                /* tamaño botón */
+                --dot: 7px;
+            }
+
+            /* Aún menos alto para que quepa mejor en vertical */
+            .wix-box {
+                aspect-ratio: 16 / 10;
+            }
+
+            .wix-inner {
+                padding: 0 6.5%;
+            }
+
+            .carousel__dots {
+                bottom: 8px;
+            }
+
+            /* Flechas bien pegadas, sin salirse */
+            .slide-1 .carousel__btn.prev {
+                left: 8px;
+            }
+
+            .slide-1 .carousel__btn.next {
+                right: 8px;
+            }
+
+            /* Por si alguna regla vieja usa la “distancia negativa”,
+     esto asegura que nuestro left/right gane. */
+            .slide-1 .carousel__btn.prev,
+            .slide-1 .carousel__btn.next {
+                transform: translateY(-50%);
+                /* mantiene centradas */
+            }
+        }
+
+        /* Móvil muy estrecho (SE, Mini, etc.) */
+        @media (max-width: 360px) {
+            .wix-box {
+                aspect-ratio: 16 / 11;
+            }
+
+            /* un poco más alto pero cómodo */
+            .slide-1 .carousel__btn.prev {
+                left: 6px;
+            }
+
+            .slide-1 .carousel__btn.next {
+                right: 6px;
+            }
+        }
+
+        /* ==== Ajustes HERO en tablet & móvil ==== */
+
+        /* ===== MOBILE (<=768px): hero GIF sin franjas ===== */
+        /* HERO solo móvil */
+        /* ===== HERO - solo móvil ===== */
+        @media (max-width: 768px) {
+
+            /* Altura del slide en mobile */
+            .slide1.slide-hero {
+                height: 60svh !important;
+                /* ajusta 55–70svh si quieres */
+                min-height: 60svh !important;
+                padding: 0 !important;
+                overflow: hidden !important;
+                background: #000;
+                /* o #fff si tu GIF tiene fondo claro */
+            }
+
+            /* MUY IMPORTANTE: darle altura al contenedor del GIF */
+            .slide1 .hero-bg {
+                position: absolute !important;
+                inset: 0 !important;
+                height: 100% !important;
+                /* <- aquí está la clave */
+                overflow: hidden !important;
+            }
+
+            /* Imagen del GIF rellenando el área */
+            .slide1 .hero-bg img {
+                position: absolute !important;
+                inset: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                object-position: center !important;
+
+                /* Opción A (recomendado, SIN FRANJAS): */
+                object-fit: cover !important;
+
+                /* Opción B (sin recorte, puede dejar margen): */
+                /* object-fit: contain !important; background:#000; */
+
+                z-index: 0 !important;
+                display: block !important;
+            }
+        }
+
+        .slide {
+            min-height: 60vh;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+            position: relative;
+            padding: var(--page-pad);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HERO -->
+    <section class="slide1 slide-hero" id="hero">
+        <div class="hero-bg">
+            <img src="img/hero.gif" alt="INCreative intro">
+        </div>
+    </section>
+
+    <!-- Intro -->
+    <section class="slide slide-0">
+        <div class="intro-wrap">
+            <h2 class="intro-title">The art of creating branding, advertising<br>and whatever you can imagine.</h2>
+            <p class="intro-sub">Gold Coast based.</p>
+        </div>
+    </section>
+
+    <!-- Carruseles -->
+    <section class="slide slide-1">
+        <div class="col-stack">
+            <!-- Fila 1 -->
+            <div class="wix-box">
+                <div class="wix-inner">
+                    <div class="carousel" data-carousel>
+                        <div class="carousel__viewport">
+                            <div class="carousel__track">
+                                <div class="carousel__slide"><img src="img/Branding/1.jpg" alt=""></div>
+                                <div class="carousel__slide"><img src="img/Branding/2.jpg" alt=""></div>
+                                <div class="carousel__slide"><img src="img/Branding/3.jpg" alt=""></div>
+                            </div>
+                            <div class="carousel__dots"></div>
+                        </div>
+                        <button class="carousel__btn prev" aria-label="Anterior">
+                            <svg class="carousel__icon" viewBox="0 0 24 24">
+                                <path d="M15.5 4.5 7.9 12l7.6 7.5-1.8 1.8L4.3 12 13.7 2.7z" />
+                            </svg>
+                        </button>
+                        <button class="carousel__btn next" aria-label="Siguiente">
+                            <svg class="carousel__icon" viewBox="0 0 24 24">
+                                <path d="M8.5 19.5 16.1 12 8.5 4.5l1.8-1.8L19.7 12l-9.4 9.3z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fila 2 -->
+            <div class="wix-box">
+                <div class="wix-inner">
+                    <div class="carousel" data-carousel>
+                        <div class="carousel__viewport">
+                            <div class="carousel__track">
+                                <div class="carousel__slide"><img src="img/Branding/1.jpg" alt=""></div>
+                                <div class="carousel__slide"><img src="img/Branding/2.jpg" alt=""></div>
+                                <div class="carousel__slide"><img src="img/Branding/3.jpg" alt=""></div>
+                            </div>
+                            <div class="carousel__dots"></div>
+                        </div>
+                        <button class="carousel__btn prev" aria-label="Anterior">
+                            <svg class="carousel__icon" viewBox="0 0 24 24">
+                                <path d="M15.5 4.5 7.9 12l7.6 7.5-1.8 1.8L4.3 12 13.7 2.7z" />
+                            </svg>
+                        </button>
+                        <button class="carousel__btn next" aria-label="Siguiente">
+                            <svg class="carousel__icon" viewBox="0 0 24 24">
+                                <path d="M8.5 19.5 16.1 12 8.5 4.5l1.8-1.8L19.7 12l-9.4 9.3z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fila 3 -->
+            <div class="wix-box">
+                <div class="wix-inner">
+                    <div class="carousel" data-carousel>
+                        <div class="carousel__viewport">
+                            <div class="carousel__track">
+                                <div class="carousel__slide"><img src="img/Branding/1.jpg" alt=""></div>
+                                <div class="carousel__slide"><img src="img/Branding/2.jpg" alt=""></div>
+                                <div class="carousel__slide"><img src="img/Branding/3.jpg" alt=""></div>
+                            </div>
+                            <div class="carousel__dots"></div>
+                        </div>
+                        <button class="carousel__btn prev" aria-label="Anterior">
+                            <svg class="carousel__icon" viewBox="0 0 24 24">
+                                <path d="M15.5 4.5 7.9 12l7.6 7.5-1.8 1.8L4.3 12 13.7 2.7z" />
+                            </svg>
+                        </button>
+                        <button class="carousel__btn next" aria-label="Siguiente">
+                            <svg class="carousel__icon" viewBox="0 0 24 24">
+                                <path d="M8.5 19.5 16.1 12 8.5 4.5l1.8-1.8L19.7 12l-9.4 9.3z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About -->
+    <section class="slide slide-about" id="about">
+        <div class="about-wrap">
+            <img class="about-photo" src="img/about.jpg" alt="Celia Bellido Jones">
+            <h2 class="about-title">About The Creator</h2>
+            <div class="about-text">
+                <p>I'm Celia Bellido Jones, a Peruvian artist and the creative director behind INCreAtive.</p>
+                <p>I have spent over a decade in the advertising industry in Peru, creating and designing ideas for
+                    respectable brands. As a result of my experience, I value the direct relationship that should exist
+                    between client and creator. I believe that together we can make your vision real. I will help you in
+                    this journey to build more than just a brand, but a real connection with your audience.</p>
+                <p>INCreAtive is one of my passions and I give all of myself to every project. I am committed to
+                    delivering the best outcome possible for you and your business.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact -->
+    <section class="slide slide-contact" id="contact">
+        <div class="contact-wrap">
+            <h2 class="contact-title">Let's Make It Happen!</h2>
+            <div class="contact-item">
+                <a href="mailto:celiabellidojones@gmail.com"><img src="img/mail.png" class="contact-icon"
+                        alt="Email"></a>
+                <a href="mailto:celiabellidojones@gmail.com" class="contact-link">celiabellidojones@gmail.com</a>
+            </div>
+            <div class="contact-item">
+                <a href="tel:+61421884522"><img src="img/phone.png" class="contact-icon" alt="Phone"></a>
+                <a href="tel:+61421884522" class="contact-link">+61 421 884 522</a>
+            </div>
+            <div class="contact-item">
+                <a href="http://instagram.com/increativeau" target="_blank" rel="noreferrer noopener"><img
+                        src="img/insta.png" class="contact-icon" alt="Instagram"></a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-inner">© 2022-2025 INCreAtive.au</div>
+    </footer>
+
+    <!-- Tu JS original (sin cambios) -->
+    <script>
+        (() => { document.querySelectorAll('[data-carousel]').forEach(root => { const viewport = root.querySelector('.carousel__viewport'), track = root.querySelector('.carousel__track'), slides = [...root.querySelectorAll('.carousel__slide')], prev = root.querySelector('.prev'), next = root.querySelector('.next'), dots = root.querySelector('.carousel__dots'); let i = 0, start = 0, dx = 0, drag = false; slides.forEach((_, k) => { const b = document.createElement('button'); b.className = 'carousel__dot'; b.type = 'button'; b.onclick = () => go(k); dots.appendChild(b) }); function render() { track.style.transform = `translateX(${-i * 100}%)`; dots.querySelectorAll('button').forEach((d, k) => d.setAttribute('aria-current', k === i)); prev.disabled = (i === 0); next.disabled = (i === slides.length - 1) } function go(x) { i = (x + slides.length) % slides.length; render() } const n = () => go(i + 1), p = () => go(i - 1); prev.onclick = p; next.onclick = n; root.tabIndex = 0; root.addEventListener('keydown', e => { if (e.key === 'ArrowRight') n(); if (e.key === 'ArrowLeft') p() }); viewport.addEventListener('pointerdown', e => { drag = true; start = e.clientX; dx = 0; viewport.setPointerCapture(e.pointerId); track.style.transition = 'none' }); viewport.addEventListener('pointermove', e => { if (!drag) return; dx = e.clientX - start; const pct = (dx / viewport.clientWidth) * 100; track.style.transform = `translateX(${-i * 100 + pct}%)` }); const end = () => { if (!drag) return; drag = false; track.style.transition = ''; if (Math.abs(dx) > viewport.clientWidth * 0.18) { dx < 0 ? n() : p() } else render() }; viewport.addEventListener('pointerup', end); viewport.addEventListener('pointercancel', end); addEventListener('resize', render, { passive: true }); render() }) })();
+    </script>
+</body>
+
+</html>
